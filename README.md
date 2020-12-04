@@ -14,6 +14,6 @@
 
 * [X] Allow for non-absolute paths / local files
 * [X] Account for Linux
-* [ ] Allow the destination path to be specified
+* [ ] ~~Allow the destination path to be specified~~ Changed my mind on this.
 * [ ] Account for MUDLET folders (I'm not sure how they look in XML)
 
