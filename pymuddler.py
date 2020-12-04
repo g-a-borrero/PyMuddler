@@ -3,6 +3,7 @@ from pathlib import Path
 import os
 import json
 import sys
+import platform
 
 #####################################################
 # This creates the files and folders in the current #
@@ -15,7 +16,13 @@ import sys
 #		account for MUDLET folders!... don't know how they look in XML, though
 
 class Directory_Maker:
-	def __init__(self, filepath):
+	# *filepath* should point directly to the file you're attempting to
+	# unpackage - whether it's an mpackage or an XML.
+	# *use_cwd* will say whether to use the the current working directory
+	# of PyMuddler or to use the working directory of the file itself.
+	def __init__(self, filepath, use_cwd=True):
+		self.platform = platform.system()
+		# This attempts to account for Linux
 		if "/" in filepath:
 			self.__filename = filepath[filepath.rindex("/")+1:]
 		elif "\\" in filepath:
@@ -23,14 +30,28 @@ class Directory_Maker:
 		else:
 			self.__filename = filepath
 		self.__filename = self.__filename[:self.__filename.rindex(".")]
-		cwd = os.path.abspath(os.getcwd())
+		if use_cwd:
+			cwd = os.path.abspath(os.getcwd())
+		else:
+			# This also attempts to account for Linux.
+			if "/" in filepath:
+				cwd = filepath[:filepath.rindex("/")]
+			elif "\\" in filepath:
+				cwd = filepath[:filepath.rindex("\\")]
+			else:
+				cwd = os.path.abspath(os.getcwd())
 		if filepath.endswith(".mpackage"):
 			print("Now attempting to unzip the mpackage.")
 			try:
 				import zipfile
-				with zipfile.ZipFile(filepath, 'r') as zip_ref:
-					zip_ref.extractall(cwd+"\\"+self.__filename+"\\unzipped\\")
-				Directory_Maker(cwd+"\\"+self.__filename+"\\unzipped\\"+self.__filename+".xml")
+				if self.platform == "Windows":
+					with zipfile.ZipFile(filepath, 'r') as zip_ref:
+						zip_ref.extractall(cwd+"\\"+self.__filename+"\\unzipped\\")
+					Directory_Maker(cwd+"\\"+self.__filename+"\\unzipped\\"+self.__filename+".xml")
+				else:
+					with zipfile.ZipFile(filepath, 'r') as zip_ref:
+						zip_ref.extractall(cwd+"/"+self.__filename+"/unzipped/")
+					Directory_Maker(cwd+"/"+self.__filename+"/unzipped/"+self.__filename+".xml")
 			except Exception as e:
 				print("An unexpected error occured trying to unpackage the file.")
 				print(e)
@@ -49,7 +70,10 @@ class XML_Parser:
 		toplevel_tags = [toplevel.tag for toplevel in root]
 		for tag in toplevel_tags:
 			f_tag = tag[:tag.index("Package")].lower()
-			f_tag_path = filepath[:filepath.rindex(".xml")]+"\\"+f_tag
+			if platform.system() == "Windows":
+				f_tag_path = filepath[:filepath.rindex(".xml")]+"\\"+f_tag
+			else:
+				f_tag_path = filepath[:filepath.rindex(".xml")]+"/"+f_tag
 			Path(f_tag_path).mkdir(parents=True, exist_ok=True)
 			for subelement in root[toplevel_tags.index(tag)]:
 				try:
@@ -74,4 +98,7 @@ class XML_Parser:
 
 
 if __name__ == "__main__":
-	Directory_Maker(sys.argv[1])
+	if len(sys.argv) == 3:
+		Directory_Maker(sys.argv[1], sys.argv[2])
+	else:
+		Directory_Maker(sys.argv[1])
