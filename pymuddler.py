@@ -83,12 +83,18 @@ class XML_Parser:
 							d[subsub.tag] = subsub.text
 						else:
 							# CREATE code.lua FILE HERE
-							code = open(f_tag_path+"\\code.lua", "w")
+							if platform.system() == "Windows":
+								code = open(f_tag_path+"\\code.lua", "w")
+							else:
+								code = open(f_tag_path+"/code.lua", "w")
 							code.write(subsub.text)
 							code.close()
 					# Once the dictionary is made...
 					json_string = json.dumps(d)
-					json_file = open(f_tag_path+"\\"+f_tag+".json", "w")
+					if platform.system() == "Windows":
+						json_file = open(f_tag_path+"\\"+f_tag+".json", "w")
+					else:
+						json_file = open(f_tag_path+"/"+f_tag+".json", "w")
 					json_file.write(json_string)
 					json_file.close()
 				except:
