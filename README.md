@@ -12,8 +12,8 @@
 
 ### To Do Maybe
 
-1. Allow for non-absolute paths / local files
-1. Account for Linux
-1. Allow the destination path to be specified
-1. Account for MUDLET folders (I'm not sure how they look in XML)
+* [X] Allow for non-absolute paths / local files
+* [X] Account for Linux
+* [ ] Allow the destination path to be specified
+* [ ] Account for MUDLET folders (I'm not sure how they look in XML)
 
