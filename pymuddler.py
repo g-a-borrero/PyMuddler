@@ -16,7 +16,12 @@ import sys
 
 class Directory_Maker:
 	def __init__(self, filepath):
-		self.__filename = filepath[filepath.rindex("\\")+1:]
+		if "/" in filepath:
+			self.__filename = filepath[filepath.rindex("/")+1:]
+		elif "\\" in filepath:
+			self.__filename = filepath[filepath.rindex("\\")+1:]
+		else:
+			self.__filename = filepath
 		self.__filename = self.__filename[:self.__filename.rindex(".")]
 		cwd = os.path.abspath(os.getcwd())
 		if filepath.endswith(".mpackage"):
